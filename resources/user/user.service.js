@@ -18,9 +18,8 @@ const loginUser = async (body) => {
 
   if (!user) return { success: false, message: "Email or password invalid" };
 
-  const isMatch = await compareHash(user.password, body.password);
+  const isMatch = await compareHash(user.toJSON()?.password, body.password);
   if (!isMatch) return { success: false, message: "Email or password invalid" };
-
   const accessToken = await token.createAccessToken(user._id);
   const refreshToken = await token.createRefreshToken(user._id);
 

@@ -40,5 +40,3 @@ exports.getUsers = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
-
-// Add other controller methods (login, update, delete, etc.)

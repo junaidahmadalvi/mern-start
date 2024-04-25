@@ -6,9 +6,9 @@ const morgan = require("morgan");
 var bodyParser = require("body-parser");
 const { BASE_URL } = require("./config/constant");
 const passport = require("./lib/passport");
-const { token } = require("./lib/jwt");
 const { authenticatedMiddleware } = require("./middleware/auth.middleware");
 const connect = require("./config/db");
+
 connect();
 
 // custom morgan's token fro timespan log
@@ -16,16 +16,19 @@ morgan.token("timespan", function (req, res) {
   return new Date().toISOString();
 });
 
+//-------globel middlewares-----
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: false })); //to encode url to prevent hacking(passing threat query in query params)
+//to encode url to prevent hacking(passing threat query in query params)
+app.use(express.urlencoded({ extended: false }));
+//for genrating api hitting logs
 app.use(
   morgan(
     "Log => " +
       ":remote-addr :method :url :status :res[content-length] - :response-time ms - :timespan"
   )
-); //for genrating api logs
+);
 
 //------ api testing for default ------------
 app.get(`${BASE_URL}`, (req, res) => {
@@ -33,45 +36,23 @@ app.get(`${BASE_URL}`, (req, res) => {
 });
 
 // ---- Routes -----
-// const userRoutes = require("./resources/user/user.route");
+const userRoutes = require("./resources/user/user.route");
+const passportGoogleRoute = require("./resources/auth/passport.google.route");
+const passportLinkedinRoute = require("./resources/auth/passport.linkedin.route");
 
-// app.use(`${BASE_URL}/auth`, userRoutes);
-
-// ----------------- Google Auth (passport-js) -------------------------------
-
+// user auth routes (custom)
+app.use(`${BASE_URL}/auth`, userRoutes);
+// initiliaze passport-js
 app.use(passport.initialize());
+// ----------------- Google Auth (passport-js) -------------------------------
+app.use(`${BASE_URL}/`, passportGoogleRoute);
+// ----------------- Linkedin Auth (passport-js) -------------------------------
+app.use(`${BASE_URL}/`, passportLinkedinRoute);
 
-// Route to authenticate with Google
-app.get(
-  `${BASE_URL}/auth/google`,
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+// globel middlware for all authenticated endpoints (custom implemented auth for jwt)
+app.use(authenticatedMiddleware);
 
-// Route for Google OAuth callback
-app.get(
-  `${BASE_URL}/auth/google/callback`,
-  passport.authenticate("google", {
-    failureRedirect: `${BASE_URL}/auth/login`,
-  }),
-  async (req, res) => {
-    // Create a JWT token for the user
-    const token = await token.createAccessToken();
-    res.json({ token });
-  }
-);
-
-// Protected route that requires JWT authentication
-app.get(
-  "/protected",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    res.json({ message: "You are authenticated!" });
-  }
-);
-
-// globel middlware for all authenticated endpoints
-// app.use(authenticatedMiddleware);
-
+//test endpoints for authenticated routes
 app.get(`${BASE_URL}/authenticated`, (req, res) => {
   res.send({
     success: "true",
