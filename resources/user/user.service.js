@@ -1,5 +1,5 @@
 const { createHash, compareHash } = require("../../common/password-helper");
-const User = require("../../infra/model/user");
+const User = require("../../infra/model/user.model");
 const { token } = require("../../lib/jwt");
 
 const registerUser = async (body) => {
