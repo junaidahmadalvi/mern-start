@@ -1,4 +1,4 @@
-const User = require("../infra/model/user");
+const User = require("../infra/model/user.model");
 const { token } = require("../lib/jwt");
 const jwt = require("jsonwebtoken");
 // module.exports = {
