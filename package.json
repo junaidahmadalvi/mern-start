@@ -4,12 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d lib"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/preset-env": "^7.24.5",
+    "babel-cli": "^6.26.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
@@ -23,6 +27,7 @@
     "passport-jwt": "^4.0.1",
     "passport-linkedin-oauth2": "^2.0.0",
     "socket.io": "^4.7.5",
+    "webpack": "^5.91.0",
     "yup": "^1.4.0"
   }
 }
